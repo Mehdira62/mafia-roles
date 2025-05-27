@@ -1,22 +1,8 @@
-// server/index.js
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
+const mongoose = require("mongoose");
 
-const assignRoleRoute = require('./routes/assignRole');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-app.use('/api/assign-role', assignRoleRoute);
-
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log('Connected to MongoDB');
-    app.listen(process.env.PORT || 8080, () => {
-      console.log(`Server running on port ${process.env.PORT || 8080}`);
-    });
-  })
-  .catch(err => console.error(err));
+mongoose.connect("mongodb+srv://baranuser:baran1234%40@cluster0.n1la9xr.mongodb.net/mafiadb?retryWrites=true&w=majority", {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("✅ Connected to MongoDB"))
+.catch((err) => console.error("❌ MongoDB connection error:", err));
