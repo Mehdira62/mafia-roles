@@ -4,15 +4,18 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
 
+const app = express();  // <--- اول این خط بیاید
+
+const getAllRolesRoute = require('./routes/getAllRoles');
 const assignRoleRoute = require('./routes/assignRole');
 const resetGameRoute = require('./routes/resetGame'); // ✅ اضافه شده
 
-const app = express();
 app.use(cors());
 app.use(express.json());
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/api/get-all-roles', getAllRolesRoute);
 app.use('/api/assign-role', assignRoleRoute);
 app.use('/api/reset-game', resetGameRoute); // ✅ اضافه شده
 

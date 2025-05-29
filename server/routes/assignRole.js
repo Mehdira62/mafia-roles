@@ -1,4 +1,3 @@
-// server/routes/assignRole.js
 const express = require('express');
 const router = express.Router();
 const Game = require('../models/Game');
@@ -21,20 +20,25 @@ router.get('/', async (req, res) => {
     });
   }
 
-  // اگر این بازیکن قبلاً نقش گرفته، همونو برگردون
   const alreadyAssigned = game.assigned.find(a => a.playerId === playerId);
-  if (alreadyAssigned) return res.send({ role: alreadyAssigned.role });
+  if (alreadyAssigned) {
+    return res.send({ 
+      role: alreadyAssigned.role,
+      image: `/images/roles/${encodeURIComponent(alreadyAssigned.role)}.png`
+    });
+  }
 
-  // فیلتر نقش‌های باقیمانده
   const remainingRoles = game.roles.filter(r => !game.assigned.some(a => a.role === r));
   if (remainingRoles.length === 0) return res.send({ message: 'نقش‌ها تمام شده‌اند.' });
 
-  // نقش تصادفی اختصاص بده
   const selectedRole = remainingRoles[Math.floor(Math.random() * remainingRoles.length)];
   game.assigned.push({ role: selectedRole, playerId });
   await game.save();
 
-  res.send({ role: selectedRole });
+  res.send({ 
+    role: selectedRole,
+    image: `/images/roles/${encodeURIComponent(selectedRole)}.png`
+  });
 });
 
 module.exports = router;

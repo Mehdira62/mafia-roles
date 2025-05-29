@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>نمایش نقش مافیا</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #f0f0f0;
+      text-align: center;
+      padding: 40px;
+      color: #333;
+    }
+    #role-name {
+      font-size: 2em;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+    #role-img {
+      max-width: 300px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    #error-msg {
+      color: red;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>نقش شما در بازی مافیا</h1>
+  <div id="role-container">
+    <h2 id="role-name">در حال دریافت نقش...</h2>
+    <img id="role-img" src="" alt="تصویر نقش" style="display:none;" />
+  </div>
+  <div id="error-msg"></div>
+
+  <script>
+    // گرفتن پارامترهای URL (game_id و player_id)
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+
+    const gameId = getQueryParam('game_id');
+    const playerId = getQueryParam('player_id');
+
+    if (!gameId) {
+      document.getElementById('error-msg').innerText = 'پارامتر game_id لازم است!';
+      document.getElementById('role-name').innerText = '';
+    } else {
+      fetch(`http://localhost:3000/api/assign-role?game_id=${encodeURIComponent(gameId)}&player_id=${encodeURIComponent(playerId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if(data.role) {
+            document.getElementById('role-name').innerText = data.role;
+            document.getElementById('role-img').src = data.image;
+            document.getElementById('role-img').style.display = 'inline-block';
+          } else if (data.message) {
+            document.getElementById('role-name').innerText = data.message;
+            document.getElementById('role-img').style.display = 'none';
+          } else {
+            document.getElementById('role-name').innerText = 'نقش یافت نشد.';
+            document.getElementById('role-img').style.display = 'none';
+          }
+        })
+        .catch(err => {
+          document.getElementById('error-msg').innerText = 'خطا در دریافت نقش از سرور';
+          console.error(err);
+          document.getElementById('role-img').style.display = 'none';
+          document.getElementById('role-name').innerText = '';
+        });
+    }
+  </script>
+</body>
+</html>

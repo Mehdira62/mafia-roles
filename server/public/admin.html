@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8" />
+  <title>پنل داور - نقش‌های بازی مافیا</title>
+  <style>
+    body {
+      font-family: Tahoma, sans-serif;
+      background: #f9f9f9;
+      padding: 20px;
+      direction: rtl;
+      text-align: center;
+    }
+    input, button {
+      font-size: 18px;
+      padding: 8px;
+      margin: 5px;
+    }
+    table {
+      margin: 20px auto;
+      border-collapse: collapse;
+      width: 80%;
+      max-width: 700px;
+      background: white;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 12px 20px;
+    }
+    th {
+      background-color: #2c3e50;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>پنل داور - مشاهده نقش‌ها</h1>
+  <div>
+    <input type="text" id="gameIdInput" placeholder="شناسه بازی (game_id)" />
+    <button onclick="loadRoles()">بارگذاری نقش‌ها</button>
+  </div>
+
+  <table id="rolesTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>شناسه بازیکن</th>
+        <th>نقش</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <div id="error" style="color:red; margin-top:20px;"></div>
+
+  <script>
+    function loadRoles() {
+      const gameId = document.getElementById('gameIdInput').value.trim();
+      if (!gameId) {
+        document.getElementById('error').innerText = 'لطفاً شناسه بازی را وارد کنید.';
+        return;
+      }
+      document.getElementById('error').innerText = '';
+      fetch(`http://localhost:3000/api/get-all-roles?game_id=${encodeURIComponent(gameId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById('error').innerText = data.error;
+            document.getElementById('rolesTable').style.display = 'none';
+            return;
+          }
+          if (!data.assigned || data.assigned.length === 0) {
+            document.getElementById('error').innerText = 'نقشی اختصاص داده نشده است.';
+            document.getElementById('rolesTable').style.display = 'none';
+            return;
+          }
+          const tbody = document.querySelector('#rolesTable tbody');
+          tbody.innerHTML = '';
+          data.assigned.forEach(player => {
+            const tr = document.createElement('tr');
+            const tdPlayer = document.createElement('td');
+            tdPlayer.textContent = player.playerId;
+            const tdRole = document.createElement('td');
+            tdRole.textContent = player.role;
+            tr.appendChild(tdPlayer);
+            tr.appendChild(tdRole);
+            tbody.appendChild(tr);
+          });
+          document.getElementById('rolesTable').style.display = 'table';
+        })
+        .catch(err => {
+          document.getElementById('error').innerText = 'خطا در دریافت داده‌ها از سرور';
+          document.getElementById('rolesTable').style.display = 'none';
+          console.error(err);
+        });
+    }
+  </script>
+
+</body>
+</html>
