@@ -1,38 +1,62 @@
-<script>
-  const API_BASE_URL = "https://mafia-roles-production.up.railway.app";
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>نقش شما در بازی</title>
+  <style>
+    body {
+      text-align: center;
+      font-family: sans-serif;
+      margin-top: 50px;
+    }
+    img {
+      margin-top: 20px;
+      width: 200px;
+    }
+  </style>
+</head>
+<body>
+  <div id="error-msg" style="color:red;"></div>
+  <h2 id="role-name">در حال بارگذاری...</h2>
+  <img id="role-img" style="display:none;" alt="نقش بازیکن">
 
-  function getQueryParam(param) {
-    const urlParams = new URLSearchParams(window.location.search);
-    return urlParams.get(param);
-  }
+  <script>
+    const API_BASE_URL = "https://mafia-roles-production.up.railway.app";
 
-  const gameId = getQueryParam('game_id');
-  const playerId = getQueryParam('player_id');
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
 
-  if (!gameId) {
-    document.getElementById('error-msg').innerText = 'پارامتر game_id لازم است!';
-    document.getElementById('role-name').innerText = '';
-  } else {
-    fetch(`${API_BASE_URL}/api/assign-role?game_id=${encodeURIComponent(gameId)}&player_id=${encodeURIComponent(playerId)}`)
-      .then(res => res.json())
-      .then(data => {
-        if(data.role) {
-          document.getElementById('role-name').innerText = data.role;
-          document.getElementById('role-img').src = `${API_BASE_URL}${data.image}`;
-          document.getElementById('role-img').style.display = 'inline-block';
-        } else if (data.message) {
-          document.getElementById('role-name').innerText = data.message;
+    const gameId = getQueryParam('game_id');
+    const playerId = getQueryParam('player_id');
+
+    if (!gameId) {
+      document.getElementById('error-msg').innerText = 'پارامتر game_id لازم است!';
+      document.getElementById('role-name').innerText = '';
+    } else {
+      fetch(`${API_BASE_URL}/api/assign-role?game_id=${encodeURIComponent(gameId)}&player_id=${encodeURIComponent(playerId)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.role) {
+            document.getElementById('role-name').innerText = data.role;
+            document.getElementById('role-img').src = `${API_BASE_URL}${data.image}`;
+            document.getElementById('role-img').style.display = 'inline-block';
+          } else if (data.message) {
+            document.getElementById('role-name').innerText = data.message;
+            document.getElementById('role-img').style.display = 'none';
+          } else {
+            document.getElementById('role-name').innerText = 'نقش یافت نشد.';
+            document.getElementById('role-img').style.display = 'none';
+          }
+        })
+        .catch(err => {
+          document.getElementById('error-msg').innerText = 'خطا در دریافت نقش از سرور';
+          console.error(err);
           document.getElementById('role-img').style.display = 'none';
-        } else {
-          document.getElementById('role-name').innerText = 'نقش یافت نشد.';
-          document.getElementById('role-img').style.display = 'none';
-        }
-      })
-      .catch(err => {
-        document.getElementById('error-msg').innerText = 'خطا در دریافت نقش از سرور';
-        console.error(err);
-        document.getElementById('role-img').style.display = 'none';
-        document.getElementById('role-name').innerText = '';
-      });
-  }
-</script>
+          document.getElementById('role-name').innerText = '';
+        });
+    }
+  </script>
+</body>
+</html>
