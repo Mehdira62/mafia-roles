@@ -1,10 +1,33 @@
 <!DOCTYPE html>
 <html lang="fa">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>پنل داور مافیا</title>
   <style>
-    /* استایل‌ها مثل قبلی */
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background: #f9f9f9;
+      direction: rtl;
+    }
+    h1 {
+      color: #333;
+    }
+    #players {
+      margin-top: 20px;
+    }
+    .player {
+      background: #fff;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    input, button {
+      padding: 8px 12px;
+      font-size: 16px;
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
@@ -14,22 +37,22 @@
   <div id="players"></div>
 
   <script>
-    const API_BASE_URL = "https://mafia-roles-production.up.railway.app";
-
     async function loadRoles() {
       const gameId = document.getElementById('gameId').value;
-      if (!gameId) return alert('لطفاً game_id را وارد کنید.');
+      if (!gameId) {
+        alert('لطفاً game_id را وارد کنید.');
+        return;
+      }
 
       try {
-        const res = await fetch(`${API_BASE_URL}/api/get-all-roles?game_id=${encodeURIComponent(gameId)}`);
-        if (!res.ok) throw new Error('خطا در پاسخ سرور');
+        const res = await fetch(`/api/get-all-roles?game_id=${encodeURIComponent(gameId)}`);
         const data = await res.json();
 
         const container = document.getElementById('players');
         container.innerHTML = '';
 
-        if (data.roles && data.roles.length > 0) {
-          data.roles.forEach(item => {
+        if (data.assigned && data.assigned.length > 0) {
+          data.assigned.forEach(item => {
             const div = document.createElement('div');
             div.className = 'player';
             div.innerText = `بازیکن: ${item.playerId} - نقش: ${item.role}`;
@@ -39,8 +62,8 @@
           container.innerText = 'هیچ نقشی ثبت نشده است.';
         }
       } catch (err) {
-        alert('خطا در دریافت اطلاعات از سرور');
-        console.error(err);
+        console.error('خطا در ارتباط با سرور:', err);
+        alert('مشکلی در دریافت اطلاعات از سرور به وجود آمده است.');
       }
     }
   </script>
